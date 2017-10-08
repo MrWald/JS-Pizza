@@ -1,93 +1,105 @@
 #pizza-info{
   width:100%;
-  height:90px;
+  height:@infoSectionHeight;
   position:fixed;
   background:rgba(0,0,0,0.8);
-  padding-right:350px;
+  padding-right:@rightPanelWidth+20px;
   top:0;
-  padding-left:130px;
-}
-#top-badge{
-  position:fixed;
-  top:0;
-  text-align: center;
-  background:#ea862e;
-  height:90px;
-  width:100px;
-  margin-left:-120px;
-  font-size: 19px;
-  padding: 15px 10px 10px;
-  text-transform: uppercase;
-  .icon{
-    bottom:-11px;
-    position:absolute;
-    transform:scaleY(-1);
-    width: 100px;
-    height: 11px;
-    left: 0;
-  }
-  #bottom-title{
-    font-size:25px;
-  }
-  a{
-    color:white;
-    text-decoration: none;
-  }
-}
-#title-info{
-  #info{
-    color: #a1a1a1;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid;
-    height:40px;
-    #phone-number{
-      font-size: 20px;
-      padding-right: 30px;
-      padding-bottom: 15px;
+  padding-left:@badgeWidth+30px;
+
+  #top-badge{
+    position:fixed;
+    top:0;
+    text-align: center;
+    background:@badgeColor;
+    height:@infoSectionHeight;
+    width:@badgeWidth;
+    margin-left:-(120px);
+    font-size: 19px;
+    padding: 15px 10px 10px;
+    text-transform: uppercase;
+
+    .icon{
+      bottom:-@iconHeight;
+      position:absolute;
+      transform:scaleY(-1);
+      width: @badgeWidth;
+      height: @iconHeight;
+      left: 0;
     }
-    #work-days{
-      font-size: 12px;
-      padding-right: 30px;
+
+    #bottom-title{
+      font-size:25px;
     }
-    #delivery{
-      font-size: 16px;
-      padding-right: 30px;
-    }
-    .sign-in-button{
-      float: right;
-      background:linear-gradient(to bottom,#f0ad4e 0,#eb9316 100%);
-    }
-  }
-  #categories{
-    padding-bottom: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    .pizza-page a{
+
+    a{
       color:white;
+      text-decoration: none;
+    }
+  }
+
+  #title-info{
+    #info{
+      color: #a1a1a1;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid;
+      height:@infoSectionHeight/2 - 5px;
+
+      #phone-number{
+        font-size: 20px;
+        padding-right: @sectionsPadding;
+        padding-bottom: 15px;
+      }
+
+      #work-days{
+        font-size: 12px;
+        padding-right: @sectionsPadding;
+      }
+
+      #delivery{
+        font-size: 16px;
+        padding-right: @sectionsPadding;
+      }
+
+      #sign-in-button{
+        float: right;
+      }
+    }
+    #categories{
+      padding-bottom: 10px;
+      font-size: 16px;
+      cursor: pointer;
+
+      .category a{
+        color:white;
+      }
     }
   }
 }
+
 #bottom-badge{
   position:fixed;
   bottom:0;
   text-align: center;
   color:white;
-  background:#ea862e;
-  height:120px;
-  width:100px;
+  background:@badgeColor;
+  height:@infoSectionHeight+@bottomElementsInc;
+  width:@badgeWidth;
   font-size: 15px;
   font-weight:bold;
   margin-left:10px;
   padding: 10px;
   text-transform: uppercase;
+
   .icon{
-    top:-11px;
+    top:-@iconHeight;
     position:absolute;
-    width: 100px;
-    height: 11px;
+    width: @badgeWidth;
+    height: @iconHeight;
     left: 0;
   }
+
   #discount-title{
     border-bottom: 2px dotted #d16301;
     margin-bottom: 7px;
