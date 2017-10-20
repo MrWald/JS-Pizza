@@ -6,6 +6,11 @@
   padding-right:@rightPanelWidth+20px;
   top:0;
   padding-left:@badgeWidth+30px;
+  @media(max-width:800px){
+    padding-right:@rightPanelWidth - 45px;
+    height:auto;
+    padding-bottom:5px;
+  }
 
   #top-badge{
     position:fixed;
@@ -50,6 +55,11 @@
         font-size: 20px;
         padding-right: @sectionsPadding;
         padding-bottom: 15px;
+        @media(max-width:700px){
+          width: 100%;
+          font-size: 14px;
+          padding: 0;
+        }
       }
 
       #work-days{
@@ -64,8 +74,16 @@
 
       #sign-in-button{
         float: right;
+        @media(max-width:700px){
+          margin-top: 5px;
+        }
+      }
+      @media(max-width:700px){
+        margin-left:-15px;
+        height:@infoSectionHeight/2 - 25px;
       }
     }
+
     #categories{
       padding-bottom: 10px;
       font-size: 16px;

@@ -9,6 +9,9 @@
   bottom:0;
   padding-top:@infoSectionHeight;
   padding-bottom:@infoSectionHeight+@bottomElementsInc;
+  @media(max-width:800px){
+      width:@rightPanelWidth - 50px;
+  }
 
   #ordered{
     font-size: 20px;
@@ -19,6 +22,9 @@
     top:0;
     height:@infoSectionHeight;
     width:100%;
+    @media(max-width:800px){
+      font-size:14px;
+    }
 
     #clear-order{
       float: right;
