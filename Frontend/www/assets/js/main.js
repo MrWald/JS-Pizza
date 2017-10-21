@@ -224,13 +224,23 @@ var $cart = $("#boughtList");
 
 function addToCart(pizza, size) {
     //Додавання однієї піци в кошик покупок
-
+    var exists=false;
+    if(!Cart.isEmpty){
+        Cart.forEach(function(item){
+            if(item.pizza===pizza && item.size===size){
+                exists=true;
+                item.quantity++;
+            }
+        });
+    }
     //Приклад реалізації, можна робити будь-яким іншим способом
-    Cart.push({
-        pizza: pizza,
-        size: size,
-        quantity: 1
-    });
+    if(!exists) {
+        Cart.push({
+            pizza: pizza,
+            size: size,
+            quantity: 1
+        });
+    }
 
     //Оновити вміст кошика на сторінці
     updateCart();
