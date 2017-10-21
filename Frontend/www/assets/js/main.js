@@ -219,6 +219,10 @@ var PizzaSize = {
 //Змінна в якій зберігаються перелік піц в кошику
 var Cart = [];
 
+$("#clear-order").click(function(){
+    Cart=[];
+    updateCart();
+});
 //HTML едемент куди будуть додаватися піци
 var $cart = $("#boughtList");
 
@@ -249,7 +253,10 @@ function addToCart(pizza, size) {
 function removeFromCart(cart_item) {
     //Видалити піцу з кошика
     //TODO: треба зробити
-
+    for(var i=0, j=0;i<Cart.length;i++){
+        if(Cart[i]!==cart_item)Cart[j++]=Cart[i];
+    }
+    Cart.pop();
     //Після видалення оновити відображення
     updateCart();
 }
@@ -286,6 +293,15 @@ function updateCart() {
 
             //Оновлюємо відображення
             updateCart();
+        });
+        $node.find(".minus").click(function(){
+            //Збільшуємо кількість замовлених піц
+            if(cart_item.quantity===1)removeFromCart(cart_item);
+            else {
+                cart_item.quantity -= 1;
+                //Оновлюємо відображення
+                updateCart();
+            }
         });
 
         $cart.append($node);
