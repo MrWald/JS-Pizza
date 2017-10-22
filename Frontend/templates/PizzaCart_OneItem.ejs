@@ -1,5 +1,11 @@
+<%
+    function getSize() {
+        if (size === 'small_size') return'Мала';
+        else return 'Велика';
+    }
+ %>
 <div class="cart-item">
-    <div class="title-cart"><%= pizza.title %> (<%= size %>)</div>
+    <div class="title-cart"><%= pizza.title %> (<%- getSize() %>)</div>
     <div class="size-info">
         <img src="../www/assets/images/size-icon.svg"><span><%= pizza[size].size %></span>
         <img src="../www/assets/images/weight.svg"><span><%= pizza[size].weight %></span>
