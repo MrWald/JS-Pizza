@@ -19,7 +19,7 @@
     <div id="pizza-title">
         <h2>
             <span class="count-tile">Усі піци</span>
-            <span class="badge orange">8</span>
+            <span class="badge orange" id="all"></span>
         </h2>
     </div>
     <div id="pizza-type">
@@ -34,12 +34,12 @@
                     Мясні
                 </a>
             </li>
-            <li role="presentation" class="pizza-filter" id="filter-pineapples">
+            <li role="presentation" class="pizza-filter" id="filter-pineapple">
                 <a href="#">
                     З ананасами
                 </a>
             </li>
-            <li role="presentation" class="pizza-filter" id="filter-mushrooms">
+            <li role="presentation" class="pizza-filter" id="filter-mushroom">
                 <a href="#">
                     З грибами
                 </a>
@@ -116,17 +116,13 @@
         </span>
     </div>
     <div id="sum">
-        <span id="sum-title">
-                    Сума замовлення
-                </span>
-        <div id="sum-number">0 грн</div>
         <div id="order">
-            <button type="button" class="btn btn-warning btn-lg btn-block button-order" disabled>
+            <button type="button" class="btn btn-warning btn-lg btn-block button-order" id="buy" disabled>
             Замовити
             </button>
         </div>
     </div>
-    <div id="boughtList"><div id="empty">Пусто в холодильнику?<br>Замовте піцу!</div></div>
+    <div id="boughtList"></div>
 </div>
 
 <!-- jQuery JavaScript -->
