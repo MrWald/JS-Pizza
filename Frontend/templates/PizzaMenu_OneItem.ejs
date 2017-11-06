@@ -43,11 +43,11 @@ function getIngredientsArray(pizza) {
                 <%if(pizza.small_size){ %>
                 <div class="<%if(pizza.big_size && pizza.small_size){ %>col-sm-6<% } else{ %>col-sm-12<% } %> pizza-small">
                     <div>
-                        <img src="../www/assets/images/size-icon.svg">
+                        <img src="assets/images/size-icon.svg">
                         <span class="diagonal"><%= pizza.small_size.size %></span>
                     </div>
                     <div>
-                        <img src="../www/assets/images/weight.svg">
+                        <img src="assets/images/weight.svg">
                         <span class="gram"><%= pizza.small_size.weight %></span>
                     </div>
                     <h2>
@@ -61,11 +61,11 @@ function getIngredientsArray(pizza) {
                 <%if(pizza.big_size){ %>
                 <div class="<%if(pizza.big_size && pizza.small_size){ %>col-sm-6<%} else{ %>col-sm-12<%}%> pizza-big">
                     <div>
-                        <img src="../www/assets/images/size-icon.svg">
+                        <img src="assets/images/size-icon.svg">
                         <span class="diagonal"><%= pizza.big_size.size %></span>
                     </div>
                     <div>
-                        <img src="../www/assets/images/weight.svg">
+                        <img src="assets/images/weight.svg">
                         <span class="gram"><%= pizza.big_size.weight %></span>
                     </div>
                     <h2>

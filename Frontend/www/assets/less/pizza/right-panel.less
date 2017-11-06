@@ -7,6 +7,7 @@
   right:0;
   top:0;
   bottom:0;
+  z-index:10000;
   padding-top:@infoSectionHeight;
   padding-bottom:@infoSectionHeight+@bottomElementsInc;
   @media(max-width:800px){
@@ -60,11 +61,15 @@
 
     #order{
       padding: 20px;
+      #reorder{
+        display:none;
+      }
     }
   }
   #boughtList{
     height:100%;
-    overflow-y:scroll;
+    overflow-y:auto;
+    overflow-x:hidden;
     background:#F5F5F5;
 
     #empty{
