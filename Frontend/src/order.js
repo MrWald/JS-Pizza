@@ -1,4 +1,14 @@
- var API = require('./API');
+var API = require('./API');
+var $client=$("#flname");
+var $clientPhone=$("#phone");
+var $clientAddress=$("#address");
+var GoogleMap=require('./googleMaps');
+var map=GoogleMap.map;
+var point=GoogleMap.point;
+var directionsDisplay=GoogleMap.directionsDisplay;
+var newMarker=GoogleMap.newMarker;
+
+
  $(".quantity-ordered").each(function (i, item) {
      var num=parseInt($(item).text(), 10);
      var add;
@@ -7,8 +17,8 @@
      $(item).text(num+" "+add);
  });
 
- $("#flname").bind("keypress", function(event){
-     var regex= new RegExp("[А-Яа-яІіЇїЄєҐґ']");
+ $client.bind("keypress", function(event){
+     var regex= new RegExp("[A-Za-zА-Яа-яІіЇїЄєҐґ']");
      var key=String.fromCharCode(!event.charCode ? event.which : event.charCode);
      if(!regex.test(key)){
          event.preventDefault();
@@ -16,7 +26,16 @@
      }
  });
 
- $("#phone").bind("keypress", function(event){
+ $client.bind("keydown", function(event){
+     window.setTimeout(function() {
+         if($client.val()===""){
+             $client.css("box-shadow", "0 0 3px #CC0000");
+         }
+         else $client.css("box-shadow", "0 0 3px #006600");
+     }, 0);
+ });
+
+ $clientPhone.bind("keypress", function(event){
      var regex;
      var key;
      var text=$(this).val();
@@ -49,10 +68,19 @@
      }
  });
 
- $("#address").bind("keypress", function(event){
+ $clientPhone.bind("keydown", function(event){
+     window.setTimeout(function() {
+         if ($clientPhone.val() === "" || ($clientPhone.val().charAt(0) === '+' && $clientPhone.val().length < 13) || ($clientPhone.val().charAt(0) === '0' && $clientPhone.val().length < 10)) {
+             $clientPhone.css("box-shadow", "0 0 3px #CC0000");
+         }
+         else $clientPhone.css("box-shadow", "0 0 3px #006600");
+     });
+ });
+
+ $clientAddress.bind("keypress", function(event){
      var regex;
      var key;
-     regex= new RegExp("^[0-9А-Яа-яІіЇїЄєҐґ'.,/ -]+$");
+     regex= new RegExp("^[0-9A-Za-zА-Яа-яІіЇїЄєҐґ'.,/ -]+$");
      key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
      if(!regex.test(key)){
          event.preventDefault();
@@ -60,24 +88,69 @@
      }
  });
 
- $("#submit").click(function () {
-     var name = $("#flname").text();
-     var phone = $("#phone").text();
-     var address = $("#address").text();
-     var order_info = {
-         name: name,
-         phone: phone,
-         address: address
-     };
-     API.createOrder(order_info, function (error, data) {
-         if (error) alert(error);
-         else {
-             alert("Success");
-             window.location.href = '/';
-             $('#clear-order').click();
-         }
+ $clientAddress.bind("keydown", function(event){
+     window.setTimeout(function() {
+         GoogleMap.geocodeAddress($clientAddress.val(), function(err, data){
+             if(!err){
+                 if(newMarker)newMarker.setMap(null);
+                 newMarker	=	new	google.maps.Marker({
+                     position: data,
+                     map: map,
+                     icon: {
+                         url:"assets/images/home-icon.png",
+                         anchor: new google.maps.Point(30, 30)
+                     }
+                 });
+                 GoogleMap.calculateRoute(point, data, function(err, data2){
+                     directionsDisplay.setDirections(data2.route);
+                     $("#timeInfo").text(data2.duration);
+                 });
+                 $clientAddress.css("box-shadow", "0 0 3px #006600");
+                 $("#addressInfo").text($clientAddress.val());
+             }
+             else $clientAddress.css("box-shadow", "0 0 3px #CC0000");
+         });
      });
  });
+
+ $("#submit").click(function () {
+     event.preventDefault();
+     var suc=true;
+     var name = $client.val();
+     if(name===""){
+         $client.css("box-shadow", "0 0 3px #CC0000");
+         suc=false;
+     }
+     else $client.css("box-shadow", "0 0 3px #006600");
+     var phone = $clientPhone.val();
+     if(phone==="" || (phone.charAt(0)==='+' && phone.length<13) || (phone.charAt(0)==='0' && phone.length<10)){
+         $clientPhone.css("box-shadow", "0 0 3px #CC0000");
+         suc=false;
+     }
+     else $clientPhone.css("box-shadow", "0 0 3px #006600");
+     var address = $clientAddress.val();
+     if(address===""){
+         $clientAddress.css("box-shadow", "0 0 3px #CC0000");
+         suc=false;
+     }
+     else $clientAddress.css("box-shadow", "0 0 3px #006600");
+     if(suc) {
+         var order_info = {
+             name: name,
+             phone: phone,
+             address: address
+         };
+         API.createOrder(order_info, function (error, data) {
+             if (error) alert(error);
+             else {
+                 alert("Success");
+                 window.location.href = '/';
+                 $('#clear-order').click();
+             }
+         });
+     }
+ });
+
  $("#reorder").click(function () {
      window.location.href = '/';
  });

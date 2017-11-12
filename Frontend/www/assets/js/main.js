@@ -53,7 +53,117 @@ exports.PizzaMenu_OneItem = ejs.compile("<%\n\nfunction getIngredientsArray(pizz
 exports.PizzaCart_OneItem = ejs.compile("<%\n    function getSize() {\n        if (size === 'small_size') return'Мала';\n        else return 'Велика';\n    }\n %>\n<div class=\"cart-item\">\n    <div class=\"title-cart\"><%= pizza.title %> (<%- getSize() %>)</div>\n    <div class=\"size-info\">\n        <img src=\"assets/images/size-icon.svg\"><span><%= pizza[size].size %></span>\n        <img src=\"assets/images/weight.svg\"><span><%= pizza[size].weight %></span>\n    </div>\n    <div class=\"price-info\">\n        <span><%= pizza[size].price*quantity %> грн.</span>\n        <button class=\"btn btn-danger btn-circle minus\">-</button>\n        <span class=\"label quantity-ordered\"><%= quantity %></span>\n        <button class=\"btn btn-success btn-circle plus\">+</button>\n        <button class=\"btn btn-circle btn-default remove\">x</button>\n    </div>\n    <img class=\"logo-cart\" src=\"<%= pizza.icon %>\">\n</div>");
 exports.PizzaSumOrder = "<span id=\"sum-title\">\n                    Сума замовлення\n                </span>\n<div id=\"sum-number\">0 грн</div>";
 
-},{"ejs":8}],3:[function(require,module,exports){
+},{"ejs":9}],3:[function(require,module,exports){
+var map;
+var point;
+var directionsDisplay;
+var newMarker;
+
+function	initialize()	{
+//Тут починаємо працювати з картою
+    directionsDisplay = new google.maps.DirectionsRenderer();
+    var mapProp =	{
+        center:	new	google.maps.LatLng(50.464379,30.519131),
+        zoom:	13
+    };
+    var html_element =	document.getElementById("googleMap");
+    map	= new google.maps.Map(html_element, mapProp);
+//Карта створена і показана
+    directionsDisplay.setMap(map);
+    directionsDisplay.setOptions( { suppressMarkers: true } );
+    point = new	google.maps.LatLng(50.464379,30.519131);
+    var marker	=	new	google.maps.Marker({
+        position: point,
+        map: map,
+        icon: {
+            url:"assets/images/map-icon.png",
+            anchor: new google.maps.Point(30, 30)
+        }
+    });
+    google.maps.event.addListener(map, 'click', function(me){
+        var coordinates	=	me.latLng;
+        geocodeLatLng(coordinates,	function(err,	adress){
+            if(!err){
+                //Дізналися адресу
+                $("#address").val(adress);
+                $("#addressInfo").text(adress);
+                if(newMarker)newMarker.setMap(null);
+                newMarker	=	new	google.maps.Marker({
+                    position: coordinates,
+                    map: map,
+                    icon: {
+                        url:"assets/images/home-icon.png",
+                        anchor: new google.maps.Point(30, 30)
+                    }
+                });
+                calculateRoute(point, coordinates, function(err, data){
+                    if(!err){
+                        directionsDisplay.setDirections(data.route);
+                        $("#timeInfo").text(data.duration);
+                    }
+                    else console.log(err);
+                })
+            } else {
+                console.log(err);
+            }
+        });
+    });
+}
+//Коли сторінка завантажилась
+google.maps.event.addDomListener(window, 'load', initialize);
+
+function geocodeLatLng(latlng, callback){
+//Модуль за роботу з адресою
+    var geocoder	=	new	google.maps.Geocoder();
+    geocoder.geocode({'location':	latlng},	function(results,	status)	{
+        if	(status	===	google.maps.GeocoderStatus.OK&&	results[1])	{
+            var adress =	results[1].formatted_address;
+            callback(null,	adress);
+        }	else	{
+            callback(new Error("Can't find address"));
+        }
+    });
+}
+
+function geocodeAddress(address, callback)	{
+    var geocoder	=	new	google.maps.Geocoder();
+    geocoder.geocode({'address':	address},	function(results,	status)	{
+        if	(status	===	google.maps.GeocoderStatus.OK && results[0])	{
+            var coordinates	=	results[0].geometry.location;
+            callback(null,	coordinates);
+        }	else	{
+            callback(new Error("Can	not	find the address"));
+        }
+    });
+}
+
+function calculateRoute(A_latlng,	 B_latlng,	callback) {
+    var directionService =	new	google.maps.DirectionsService();
+    directionService.route({
+        origin:	A_latlng,
+        destination:	B_latlng,
+        travelMode:	google.maps.TravelMode["DRIVING"]
+    }, function(response,	status)	{
+        if	(status	==	google.maps.DirectionsStatus.OK) {
+            var leg	=	response.routes[0].legs[0];
+            callback(null,	{
+                route: response,
+                duration:	leg.duration.text
+            });
+        }	else	{
+            callback(new	Error("Can't find direction"));
+        }
+    });
+}
+
+exports.geocodeLatLng=geocodeLatLng;
+exports.geocodeAddress=geocodeAddress;
+exports.calculateRoute=calculateRoute;
+exports.map=map;
+exports.point=point;
+exports.directionsDisplay=directionsDisplay;
+exports.newMarker=newMarker;
+},{}],4:[function(require,module,exports){
 /**
  * Created by chaika on 25.01.16.
  */
@@ -69,8 +179,18 @@ $(function(){
 
 
 });
-},{"./order":4,"./pizza/PizzaCart":5,"./pizza/PizzaMenu":6}],4:[function(require,module,exports){
- var API = require('./API');
+},{"./order":5,"./pizza/PizzaCart":6,"./pizza/PizzaMenu":7}],5:[function(require,module,exports){
+var API = require('./API');
+var $client=$("#flname");
+var $clientPhone=$("#phone");
+var $clientAddress=$("#address");
+var GoogleMap=require('./googleMaps');
+var map=GoogleMap.map;
+var point=GoogleMap.point;
+var directionsDisplay=GoogleMap.directionsDisplay;
+var newMarker=GoogleMap.newMarker;
+
+
  $(".quantity-ordered").each(function (i, item) {
      var num=parseInt($(item).text(), 10);
      var add;
@@ -79,8 +199,8 @@ $(function(){
      $(item).text(num+" "+add);
  });
 
- $("#flname").bind("keypress", function(event){
-     var regex= new RegExp("[А-Яа-яІіЇїЄєҐґ']");
+ $client.bind("keypress", function(event){
+     var regex= new RegExp("[A-Za-zА-Яа-яІіЇїЄєҐґ']");
      var key=String.fromCharCode(!event.charCode ? event.which : event.charCode);
      if(!regex.test(key)){
          event.preventDefault();
@@ -88,7 +208,16 @@ $(function(){
      }
  });
 
- $("#phone").bind("keypress", function(event){
+ $client.bind("keydown", function(event){
+     window.setTimeout(function() {
+         if($client.val()===""){
+             $client.css("box-shadow", "0 0 3px #CC0000");
+         }
+         else $client.css("box-shadow", "0 0 3px #006600");
+     }, 0);
+ });
+
+ $clientPhone.bind("keypress", function(event){
      var regex;
      var key;
      var text=$(this).val();
@@ -121,10 +250,19 @@ $(function(){
      }
  });
 
- $("#address").bind("keypress", function(event){
+ $clientPhone.bind("keydown", function(event){
+     window.setTimeout(function() {
+         if ($clientPhone.val() === "" || ($clientPhone.val().charAt(0) === '+' && $clientPhone.val().length < 13) || ($clientPhone.val().charAt(0) === '0' && $clientPhone.val().length < 10)) {
+             $clientPhone.css("box-shadow", "0 0 3px #CC0000");
+         }
+         else $clientPhone.css("box-shadow", "0 0 3px #006600");
+     });
+ });
+
+ $clientAddress.bind("keypress", function(event){
      var regex;
      var key;
-     regex= new RegExp("^[0-9А-Яа-яІіЇїЄєҐґ'.,/ -]+$");
+     regex= new RegExp("^[0-9A-Za-zА-Яа-яІіЇїЄєҐґ'.,/ -]+$");
      key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
      if(!regex.test(key)){
          event.preventDefault();
@@ -132,28 +270,73 @@ $(function(){
      }
  });
 
- $("#submit").click(function () {
-     var name = $("#flname").text();
-     var phone = $("#phone").text();
-     var address = $("#address").text();
-     var order_info = {
-         name: name,
-         phone: phone,
-         address: address
-     };
-     API.createOrder(order_info, function (error, data) {
-         if (error) alert(error);
-         else {
-             alert("Success");
-             window.location.href = '/';
-             $('#clear-order').click();
-         }
+ $clientAddress.bind("keydown", function(event){
+     window.setTimeout(function() {
+         GoogleMap.geocodeAddress($clientAddress.val(), function(err, data){
+             if(!err){
+                 if(newMarker)newMarker.setMap(null);
+                 newMarker	=	new	google.maps.Marker({
+                     position: data,
+                     map: map,
+                     icon: {
+                         url:"assets/images/home-icon.png",
+                         anchor: new google.maps.Point(30, 30)
+                     }
+                 });
+                 GoogleMap.calculateRoute(point, data, function(err, data2){
+                     directionsDisplay.setDirections(data2.route);
+                     $("#timeInfo").text(data2.duration);
+                 });
+                 $clientAddress.css("box-shadow", "0 0 3px #006600");
+                 $("#addressInfo").text($clientAddress.val());
+             }
+             else $clientAddress.css("box-shadow", "0 0 3px #CC0000");
+         });
      });
  });
+
+ $("#submit").click(function () {
+     event.preventDefault();
+     var suc=true;
+     var name = $client.val();
+     if(name===""){
+         $client.css("box-shadow", "0 0 3px #CC0000");
+         suc=false;
+     }
+     else $client.css("box-shadow", "0 0 3px #006600");
+     var phone = $clientPhone.val();
+     if(phone==="" || (phone.charAt(0)==='+' && phone.length<13) || (phone.charAt(0)==='0' && phone.length<10)){
+         $clientPhone.css("box-shadow", "0 0 3px #CC0000");
+         suc=false;
+     }
+     else $clientPhone.css("box-shadow", "0 0 3px #006600");
+     var address = $clientAddress.val();
+     if(address===""){
+         $clientAddress.css("box-shadow", "0 0 3px #CC0000");
+         suc=false;
+     }
+     else $clientAddress.css("box-shadow", "0 0 3px #006600");
+     if(suc) {
+         var order_info = {
+             name: name,
+             phone: phone,
+             address: address
+         };
+         API.createOrder(order_info, function (error, data) {
+             if (error) alert(error);
+             else {
+                 alert("Success");
+                 window.location.href = '/';
+                 $('#clear-order').click();
+             }
+         });
+     }
+ });
+
  $("#reorder").click(function () {
      window.location.href = '/';
  });
-},{"./API":1}],5:[function(require,module,exports){
+},{"./API":1,"./googleMaps":3}],6:[function(require,module,exports){
 /**
  * Created by chaika on 02.02.16.
  */
@@ -307,7 +490,7 @@ exports.getPizzaInCart = getPizzaInCart;
 exports.initialiseCart = initialiseCart;
 
 exports.PizzaSize = PizzaSize;
-},{"../Templates":2}],6:[function(require,module,exports){
+},{"../Templates":2}],7:[function(require,module,exports){
 /**
  * Created by chaika on 02.02.16.
  */
@@ -381,9 +564,9 @@ function initialiseMenu() {
 
 exports.filterPizza = filterPizza;
 exports.initialiseMenu = initialiseMenu;
-},{"../API":1,"../Templates":2,"./PizzaCart":5}],7:[function(require,module,exports){
+},{"../API":1,"../Templates":2,"./PizzaCart":6}],8:[function(require,module,exports){
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /*
  * EJS Embedded JavaScript templates
  * Copyright 2112 Matthew Eernisse (mde@fleegix.org)
@@ -1251,7 +1434,7 @@ if (typeof window != 'undefined') {
   window.ejs = exports;
 }
 
-},{"../package.json":10,"./utils":9,"fs":7,"path":11}],9:[function(require,module,exports){
+},{"../package.json":11,"./utils":10,"fs":8,"path":12}],10:[function(require,module,exports){
 /*
  * EJS Embedded JavaScript templates
  * Copyright 2112 Matthew Eernisse (mde@fleegix.org)
@@ -1417,7 +1600,7 @@ exports.cache = {
   }
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports={
   "_from": "ejs@^2.4.1",
   "_id": "ejs@2.5.7",
@@ -1498,7 +1681,7 @@ module.exports={
   "version": "2.5.7"
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -1726,7 +1909,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":12}],12:[function(require,module,exports){
+},{"_process":13}],13:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1912,4 +2095,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[3]);
+},{}]},{},[4]);

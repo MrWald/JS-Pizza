@@ -1,14 +1,21 @@
 
 <div id="left-panel">
-    <div class="data_field">1. Контактні дані</div>
-    <form>
-        <div><label for="flname">Ім'я</label><input type="text" id="flname" placeholder="Ім'я Фамілія"></div>
-        <div><label for="phone">Телефон</label><input type="text" id="phone" placeholder="+380994010999" pattern="[0-9]"></div>
-        <div><label for="address">Адреса</label><input type="text" id="address" placeholder="Київ, вул. Спаська, 2" pattern="[A-Za-z]"></div>
-        <button class="btn btn-warning  buy-big" id="submit">Далі ></button>
-    </form>
+    <div id="input">
+        <div class="data_field">1. Контактні дані</div>
+        <form class="col-md-7">
+            <div><label for="flname">Ім'я</label><input type="text" id="flname" placeholder="Ім'я Фамілія"></div>
+            <div><label for="phone">Телефон</label><input type="text" id="phone" placeholder="+380994010999"></div>
+            <div><label for="address">Адреса</label><input type="text" id="address" placeholder="Київ, вул. Спаська, 2"></div>
+        </form>
+        <div id="infoOrder" class="col-md-5">
+            <div class="data_field">Інформація про замовлення</div>
+            <div class="infoItem"><b>Приблизний час доставки: </b><span id="timeInfo">невідомий</span></div>
+            <div class="infoItem"><b>Адреса доставки: </b><span id="addressInfo">невідома</span></div>
+        </div>
+    </div>
+    <button class="btn btn-warning buy-big" id="submit">Далі ></button>
+    <div id="googleMap"></div>
 </div>
-
 <footer>
     <p>Pizza.22 - практичний проект в межах курсу JavaScript в Києво-Могилянській Академії</p>
     <p>
@@ -21,7 +28,7 @@
 
 <!--Bootsrap JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
+<script	type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyB1XnBC1LMMcZnQMfXzD_TJirqj0KqP73U"></script>
 <!--Own JavaScript -->
 <script type="text/javascript"  src="assets/js/main.js"> </script>
 </body>
