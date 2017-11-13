@@ -140,16 +140,21 @@ var Pay=require('./payment');
      }
      else $clientAddress.css("box-shadow", "0 0 3px #006600");
      if(suc) {
+         var pizzas=require('./pizza/PizzaCart').getPizzaInCart();
+         var pizzasLine="";
+         for(var i=0;i<pizzas.length;i++){
+             pizzasLine+="- "+pizzas[i].quantity+"шт. ["+(pizzas[i].size==='big_size'?"Велика":"Мала")+"] "+pizzas[i].pizza.title+";\n"
+         }
          var order_info = {
              name: name,
              phone: phone,
              address: address,
-             cost: parseInt($("#sum-number").text().split(" ")[0])*1.00
+             cost: parseFloat($("#sum-number").text().split(" ")[0])*1.00,
+             pizzas:pizzasLine
          };
          API.createOrder(order_info, function (error, data) {
              if (error) alert(error);
              else {
-                 alert(data.status);
                  window.LiqPayCheckoutCallback=Pay.create(data.data, data.signature);
              }
          });

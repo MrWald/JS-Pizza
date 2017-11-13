@@ -323,16 +323,21 @@ var Pay=require('./payment');
      }
      else $clientAddress.css("box-shadow", "0 0 3px #006600");
      if(suc) {
+         var pizzas=require('./pizza/PizzaCart').getPizzaInCart();
+         var pizzasLine="";
+         for(var i=0;i<pizzas.length;i++){
+             pizzasLine+="- "+pizzas[i].quantity+"шт. ["+(pizzas[i].size==='big_size'?"Велика":"Мала")+"] "+pizzas[i].pizza.title+";\n"
+         }
          var order_info = {
              name: name,
              phone: phone,
              address: address,
-             cost: parseInt($("#sum-number").text().split(" ")[0])*1.00
+             cost: parseFloat($("#sum-number").text().split(" ")[0])*1.00,
+             pizzas:pizzasLine
          };
          API.createOrder(order_info, function (error, data) {
              if (error) alert(error);
              else {
-                 alert(data.status);
                  window.LiqPayCheckoutCallback=Pay.create(data.data, data.signature);
              }
          });
@@ -343,23 +348,28 @@ var Pay=require('./payment');
  $("#reorder").click(function () {
      window.location.href = '/';
  });
-},{"./API":1,"./googleMaps":3,"./payment":6}],6:[function(require,module,exports){
+},{"./API":1,"./googleMaps":3,"./payment":6,"./pizza/PizzaCart":7}],6:[function(require,module,exports){
 
 var create = function (data, signature) {
+    var suc;
     LiqPayCheckout.init({
         data: data,
         signature: signature,
         embedTo: "#liqpay",
-        mode: "popup"	//	embed	||	popup
+        mode: "popup"
     }).on("liqpay.callback", function (data) {
         console.log(data.status);
         console.log(data);
+        suc=data.result==="success";
     }).on("liqpay.ready", function (data) {
 //	ready
     }).on("liqpay.close", function (data) {
 //	close
-        window.location.href = '/';
-        $('#clear-order').click();
+        if(suc) {
+            alert("Транзакція успішна!\n    Дякуємо за купівлю!:)");
+            window.location.href = '/';
+            $('#clear-order').click();
+        }
     });
 };
 
