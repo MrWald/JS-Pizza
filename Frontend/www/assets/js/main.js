@@ -53,7 +53,7 @@ exports.PizzaMenu_OneItem = ejs.compile("<%\n\nfunction getIngredientsArray(pizz
 exports.PizzaCart_OneItem = ejs.compile("<%\n    function getSize() {\n        if (size === 'small_size') return'Мала';\n        else return 'Велика';\n    }\n %>\n<div class=\"cart-item\">\n    <div class=\"title-cart\"><%= pizza.title %> (<%- getSize() %>)</div>\n    <div class=\"size-info\">\n        <img src=\"assets/images/size-icon.svg\"><span><%= pizza[size].size %></span>\n        <img src=\"assets/images/weight.svg\"><span><%= pizza[size].weight %></span>\n    </div>\n    <div class=\"price-info\">\n        <span><%= pizza[size].price*quantity %> грн.</span>\n        <button class=\"btn btn-danger btn-circle minus\">-</button>\n        <span class=\"label quantity-ordered\"><%= quantity %></span>\n        <button class=\"btn btn-success btn-circle plus\">+</button>\n        <button class=\"btn btn-circle btn-default remove\">x</button>\n    </div>\n    <img class=\"logo-cart\" src=\"<%= pizza.icon %>\">\n</div>");
 exports.PizzaSumOrder = "<span id=\"sum-title\">\n                    Сума замовлення\n                </span>\n<div id=\"sum-number\">0 грн</div>";
 
-},{"ejs":9}],3:[function(require,module,exports){
+},{"ejs":10}],3:[function(require,module,exports){
 var map;
 var point;
 var directionsDisplay;
@@ -87,6 +87,7 @@ function	initialize()	{
                 //Дізналися адресу
                 $("#address").val(adress);
                 $("#addressInfo").text(adress);
+                $("#address").css("box-shadow", "0 0 3px #006600");
                 if(newMarker)newMarker.setMap(null);
                 newMarker	=	new	google.maps.Marker({
                     position: coordinates,
@@ -179,7 +180,7 @@ $(function(){
 
 
 });
-},{"./order":5,"./pizza/PizzaCart":6,"./pizza/PizzaMenu":7}],5:[function(require,module,exports){
+},{"./order":5,"./pizza/PizzaCart":7,"./pizza/PizzaMenu":8}],5:[function(require,module,exports){
 var API = require('./API');
 var $client=$("#flname");
 var $clientPhone=$("#phone");
@@ -189,6 +190,7 @@ var map=GoogleMap.map;
 var point=GoogleMap.point;
 var directionsDisplay=GoogleMap.directionsDisplay;
 var newMarker=GoogleMap.newMarker;
+var Pay=require('./payment');
 
 
  $(".quantity-ordered").each(function (i, item) {
@@ -290,7 +292,11 @@ var newMarker=GoogleMap.newMarker;
                  $clientAddress.css("box-shadow", "0 0 3px #006600");
                  $("#addressInfo").text($clientAddress.val());
              }
-             else $clientAddress.css("box-shadow", "0 0 3px #CC0000");
+             else {
+                 $("#addressInfo").text("невідома");
+                 $("#timeInfo").text("невідомий");
+                 $clientAddress.css("box-shadow", "0 0 3px #CC0000");
+             }
          });
      });
  });
@@ -320,23 +326,45 @@ var newMarker=GoogleMap.newMarker;
          var order_info = {
              name: name,
              phone: phone,
-             address: address
+             address: address,
+             cost: parseInt($("#sum-number").text().split(" ")[0])*1.00
          };
          API.createOrder(order_info, function (error, data) {
              if (error) alert(error);
              else {
-                 alert("Success");
-                 window.location.href = '/';
-                 $('#clear-order').click();
+                 alert(data.status);
+                 window.LiqPayCheckoutCallback=Pay.create(data.data, data.signature);
              }
          });
+
      }
  });
 
  $("#reorder").click(function () {
      window.location.href = '/';
  });
-},{"./API":1,"./googleMaps":3}],6:[function(require,module,exports){
+},{"./API":1,"./googleMaps":3,"./payment":6}],6:[function(require,module,exports){
+
+var create = function (data, signature) {
+    LiqPayCheckout.init({
+        data: data,
+        signature: signature,
+        embedTo: "#liqpay",
+        mode: "popup"	//	embed	||	popup
+    }).on("liqpay.callback", function (data) {
+        console.log(data.status);
+        console.log(data);
+    }).on("liqpay.ready", function (data) {
+//	ready
+    }).on("liqpay.close", function (data) {
+//	close
+        window.location.href = '/';
+        $('#clear-order').click();
+    });
+};
+
+exports.create=create;
+},{}],7:[function(require,module,exports){
 /**
  * Created by chaika on 02.02.16.
  */
@@ -490,7 +518,7 @@ exports.getPizzaInCart = getPizzaInCart;
 exports.initialiseCart = initialiseCart;
 
 exports.PizzaSize = PizzaSize;
-},{"../Templates":2}],7:[function(require,module,exports){
+},{"../Templates":2}],8:[function(require,module,exports){
 /**
  * Created by chaika on 02.02.16.
  */
@@ -564,9 +592,9 @@ function initialiseMenu() {
 
 exports.filterPizza = filterPizza;
 exports.initialiseMenu = initialiseMenu;
-},{"../API":1,"../Templates":2,"./PizzaCart":6}],8:[function(require,module,exports){
+},{"../API":1,"../Templates":2,"./PizzaCart":7}],9:[function(require,module,exports){
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /*
  * EJS Embedded JavaScript templates
  * Copyright 2112 Matthew Eernisse (mde@fleegix.org)
@@ -1434,7 +1462,7 @@ if (typeof window != 'undefined') {
   window.ejs = exports;
 }
 
-},{"../package.json":11,"./utils":10,"fs":8,"path":12}],10:[function(require,module,exports){
+},{"../package.json":12,"./utils":11,"fs":9,"path":13}],11:[function(require,module,exports){
 /*
  * EJS Embedded JavaScript templates
  * Copyright 2112 Matthew Eernisse (mde@fleegix.org)
@@ -1600,7 +1628,7 @@ exports.cache = {
   }
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 module.exports={
   "_from": "ejs@^2.4.1",
   "_id": "ejs@2.5.7",
@@ -1681,7 +1709,7 @@ module.exports={
   "version": "2.5.7"
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -1909,7 +1937,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":13}],13:[function(require,module,exports){
+},{"_process":14}],14:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 

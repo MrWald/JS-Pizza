@@ -31,6 +31,7 @@ function	initialize()	{
                 //Дізналися адресу
                 $("#address").val(adress);
                 $("#addressInfo").text(adress);
+                $("#address").css("box-shadow", "0 0 3px #006600");
                 if(newMarker)newMarker.setMap(null);
                 newMarker	=	new	google.maps.Marker({
                     position: coordinates,

@@ -7,6 +7,7 @@ var map=GoogleMap.map;
 var point=GoogleMap.point;
 var directionsDisplay=GoogleMap.directionsDisplay;
 var newMarker=GoogleMap.newMarker;
+var Pay=require('./payment');
 
 
  $(".quantity-ordered").each(function (i, item) {
@@ -108,7 +109,11 @@ var newMarker=GoogleMap.newMarker;
                  $clientAddress.css("box-shadow", "0 0 3px #006600");
                  $("#addressInfo").text($clientAddress.val());
              }
-             else $clientAddress.css("box-shadow", "0 0 3px #CC0000");
+             else {
+                 $("#addressInfo").text("невідома");
+                 $("#timeInfo").text("невідомий");
+                 $clientAddress.css("box-shadow", "0 0 3px #CC0000");
+             }
          });
      });
  });
@@ -138,16 +143,17 @@ var newMarker=GoogleMap.newMarker;
          var order_info = {
              name: name,
              phone: phone,
-             address: address
+             address: address,
+             cost: parseInt($("#sum-number").text().split(" ")[0])*1.00
          };
          API.createOrder(order_info, function (error, data) {
              if (error) alert(error);
              else {
-                 alert("Success");
-                 window.location.href = '/';
-                 $('#clear-order').click();
+                 alert(data.status);
+                 window.LiqPayCheckoutCallback=Pay.create(data.data, data.signature);
              }
          });
+
      }
  });
 
