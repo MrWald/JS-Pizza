@@ -19,7 +19,7 @@ var Pay=require('./payment');
  });
 
  $client.bind("keypress", function(event){
-     var regex= new RegExp("[A-Za-zА-Яа-яІіЇїЄєҐґ']");
+     var regex= new RegExp("^[0-9A-Za-zА-Яа-яІіЇїЄєҐґ'/ -]+$");
      var key=String.fromCharCode(!event.charCode ? event.which : event.charCode);
      if(!regex.test(key)){
          event.preventDefault();
